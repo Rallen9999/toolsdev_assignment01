@@ -1,0 +1,54 @@
+import nltk
+import newspaper
+
+keyword = input("Enter any keyword and/or press 'Enter'. : ")
+
+cnn_news = newspaper.build('http://cnn.com', memoize_articles=False)
+nbc_news = newspaper.build('http://nbcnews.com/', memoize_articles=False)
+bbc_news = newspaper.build('https://www.bbc.com/', memoize_articles=False)
+
+nltk.download('punkt')
+
+def goodArticle(keyword , Article):
+	try:
+		Article.download()
+		Article.parse()
+		Article.nlp()
+	except:
+		return False
+	if keyword in Article.keywords: return True
+	return False
+
+def articleSearcher(keyword, articles, myArticle):
+	tempSummaries = ""
+	for Article in articles:
+		if keyword == "" or goodArticle(keyword,Article):
+			try:
+				myArticles.append(Article)
+				Article.download()
+				Article.parse()
+			except:
+				continue
+			tempSummaries += Article.title
+			tempSummaries += "-"
+			tempSummaries += ",".join(Article.authors)
+			Article.nlp()
+			tempSummaries += "\n"
+			tempSummaries += Article.summary
+			tempSummaries += "\n\n"
+
+	return tempSummaries
+
+myArticles = []
+summaries = ""
+summaries += articleSearcher(keyword,cnn_news.articles[:20],myArticles)
+summaries += articleSearcher(keyword,nbc_news.articles[:20],myArticles)
+summaries += articleSearcher(keyword,bbc_news.articles[:20],myArticles)
+
+summaries = summaries.encode("ascii", "ignore").decode()
+with open("news_summary.txt", "w")as f:
+	f.write(summaries)
+
+print("cnn.com")
+print("nbcnews.com")
+print("bbc.com")
